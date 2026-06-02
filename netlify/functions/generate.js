@@ -17,7 +17,7 @@ exports.handler = async (event) => {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5',
         max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }]
       })
@@ -35,6 +35,13 @@ exports.handler = async (event) => {
     };
 
   } catch (err) {
+    console.log('Error:', err.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message })
+    };
+  }
+};  } catch (err) {
     console.log('Error:', err.message);
     return {
       statusCode: 500,
