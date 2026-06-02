@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Richual — Write Your Life</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #E2CDB4;
+    --brown: #705D47;
+    --dark-brown: #3D2B1F;
+    --light-cream: #F5EDE0;
+    --mid-cream: #EDD9C0;
+    --gold: #C4A882;
+    --text-dark: #2C1810;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--light-cream);
+    color: var(--text-dark);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grain texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---- HEADER ---- */
+  .header {
+    text-align: center;
+    padding: 60px 24px 40px;
+    position: relative;
+  }
+
+  .header-rule {
+    width: 80px;
+    height: 1px;
+    background: var(--brown);
+    margin: 0 auto 24px;
+    opacity: 0.6;
+  }
+
+  .header-eyebrow {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--brown);
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.2s;
+  }
+
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 12vw, 72px);
+    font-weight: 400;
+    color: var(--dark-brown);
+    line-height: 1;
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.4s;
+  }
+
+  .header-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--brown);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.6s;
+  }
+
+  .header-rule-bottom {
+    width: 80px;
+    height: 1px;
+    background: var(--brown);
+    margin: 0 auto 28px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.7s;
+  }
+
+  .header-intro {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    line-height: 1.8;
+    color: var(--brown);
+    font-style: italic;
+    max-width: 480px;
+    margin: 0 auto;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.8s;
+  }
+
+  /* ---- SCREEN MANAGEMENT ---- */
+  .screen {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .screen.active {
+    display: block;
+    opacity: 1;
+  }
+
+  /* ---- QUESTIONS SCREEN ---- */
+  .questions-container {
+    padding: 20px 0 60px;
+  }
+
+  .progress-bar-wrap {
+    background: rgba(112, 93, 71, 0.15);
+    height: 2px;
+    border-radius: 2px;
+    margin-bottom: 48px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--brown);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .question-block {
+    display: none;
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .question-block.active {
+    display: block;
+  }
+
+  .question-number {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 5vw, 28px);
+    font-weight: 400;
+    color: var(--dark-brown);
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+
+  .question-hint {
+    font-size: 15px;
+    color: var(--brown);
+    font-style: italic;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .answer-field {
+    width: 100%;
+    background: rgba(226, 205, 180, 0.3);
+    border: 1px solid rgba(112, 93, 71, 0.3);
+    border-radius: 4px;
+    padding: 18px 20px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    color: var(--text-dark);
+    line-height: 1.7;
+    resize: none;
+    min-height: 120px;
+    outline: none;
+    transition: border-color 0.3s ease, background 0.3s ease;
+  }
+
+  .answer-field:focus {
+    border-color: rgba(112, 93, 71, 0.7);
+    background: rgba(226, 205, 180, 0.5);
+  }
+
+  .answer-field::placeholder {
+    color: rgba(112, 93, 71, 0.5);
+    font-style: italic;
+  }
+
+  .question-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+  }
+
+  .btn-back {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--brown);
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    padding: 8px 0;
+  }
+
+  .btn-back:hover { opacity: 1; }
+  .btn-back.hidden { visibility: hidden; }
+
+  .btn-next {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--light-cream);
+    background: var(--brown);
+    border: none;
+    cursor: pointer;
+    padding: 14px 36px;
+    border-radius: 2px;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .btn-next:hover {
+    background: var(--dark-brown);
+    transform: translateY(-1px);
+  }
+
+  .btn-next:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ---- LOADING SCREEN ---- */
+  .loading-screen {
+    text-align: center;
+    padding: 80px 24px;
+  }
+
+  .loading-ornament {
+    font-size: 32px;
+    color: var(--brown);
+    margin-bottom: 32px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .loading-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--dark-brown);
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+
+  .loading-text {
+    font-size: 17px;
+    color: var(--brown);
+    font-style: italic;
+    line-height: 1.8;
+    max-width: 360px;
+    margin: 0 auto 40px;
+  }
+
+  .loading-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .loading-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brown);
+    animation: dotBounce 1.4s ease-in-out infinite;
+  }
+
+  .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  /* ---- SCRIPT SCREEN ---- */
+  .script-screen {
+    padding: 20px 0 80px;
+  }
+
+  .script-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .script-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--brown);
+    margin-bottom: 16px;
+  }
+
+  .script-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--dark-brown);
+    margin-bottom: 8px;
+  }
+
+  .script-subtitle {
+    font-size: 16px;
+    color: var(--brown);
+    font-style: italic;
+  }
+
+  .script-divider {
+    width: 60px;
+    height: 1px;
+    background: var(--brown);
+    margin: 24px auto;
+    opacity: 0.5;
+  }
+
+  .script-card {
+    background: rgba(226, 205, 180, 0.25);
+    border: 1px solid rgba(112, 93, 71, 0.2);
+    border-radius: 4px;
+    padding: 40px 36px;
+    margin-bottom: 32px;
+    position: relative;
+  }
+
+  .script-card::before {
+    content: '✦';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--light-cream);
+    padding: 0 12px;
+    color: var(--brown);
+    font-size: 14px;
+  }
+
+  .script-content {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    line-height: 2;
+    color: var(--text-dark);
+    white-space: pre-wrap;
+  }
+
+  .script-instructions {
+    background: rgba(112, 93, 71, 0.08);
+    border-left: 2px solid var(--brown);
+    padding: 20px 24px;
+    margin-bottom: 32px;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .script-instructions-title {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brown);
+    margin-bottom: 12px;
+  }
+
+  .script-instructions-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--brown);
+    font-style: italic;
+  }
+
+  .script-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+
+  .btn-copy {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--light-cream);
+    background: var(--brown);
+    border: none;
+    cursor: pointer;
+    padding: 16px 36px;
+    border-radius: 2px;
+    transition: background 0.2s ease, transform 0.2s ease;
+    width: 100%;
+  }
+
+  .btn-copy:hover {
+    background: var(--dark-brown);
+    transform: translateY(-1px);
+  }
+
+  .btn-restart {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brown);
+    background: transparent;
+    border: 1px solid rgba(112, 93, 71, 0.4);
+    cursor: pointer;
+    padding: 16px 36px;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    width: 100%;
+  }
+
+  .btn-restart:hover {
+    border-color: var(--brown);
+    background: rgba(112, 93, 71, 0.05);
+  }
+
+  .upsell-card {
+    background: var(--cream);
+    border-radius: 4px;
+    padding: 36px 32px;
+    text-align: center;
+    border: 1px solid rgba(112, 93, 71, 0.2);
+  }
+
+  .upsell-ornament {
+    font-size: 20px;
+    color: var(--brown);
+    margin-bottom: 16px;
+  }
+
+  .upsell-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--dark-brown);
+    margin-bottom: 12px;
+  }
+
+  .upsell-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--brown);
+    font-style: italic;
+    margin-bottom: 24px;
+  }
+
+  .btn-upsell {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--light-cream);
+    background: var(--dark-brown);
+    border: none;
+    cursor: pointer;
+    padding: 16px 40px;
+    border-radius: 2px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .btn-upsell:hover {
+    background: var(--brown);
+    transform: translateY(-1px);
+  }
+
+  /* ---- WELCOME SCREEN ---- */
+  .welcome-screen {
+    padding: 20px 0 80px;
+    text-align: center;
+  }
+
+  .welcome-body {
+    font-size: 17px;
+    line-height: 1.9;
+    color: var(--brown);
+    margin-bottom: 32px;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .welcome-list {
+    list-style: none;
+    margin-bottom: 40px;
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .welcome-list li {
+    font-size: 16px;
+    color: var(--brown);
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(112, 93, 71, 0.15);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    line-height: 1.5;
+  }
+
+  .welcome-list li::before {
+    content: '✦';
+    color: var(--gold);
+    font-size: 10px;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+
+  .btn-begin {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--light-cream);
+    background: var(--brown);
+    border: none;
+    cursor: pointer;
+    padding: 18px 56px;
+    border-radius: 2px;
+    transition: background 0.2s ease, transform 0.2s ease;
+    margin-bottom: 16px;
+  }
+
+  .btn-begin:hover {
+    background: var(--dark-brown);
+    transform: translateY(-2px);
+  }
+
+  .welcome-note {
+    font-size: 13px;
+    color: var(--gold);
+    font-style: italic;
+    letter-spacing: 0.05em;
+  }
+
+  /* ---- ERROR STATE ---- */
+  .error-box {
+    background: rgba(112, 93, 71, 0.1);
+    border: 1px solid rgba(112, 93, 71, 0.3);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin-top: 24px;
+    font-size: 15px;
+    color: var(--brown);
+    font-style: italic;
+    text-align: center;
+    display: none;
+  }
+
+  /* ---- FOOTER ---- */
+  .footer {
+    text-align: center;
+    padding: 32px 24px;
+    border-top: 1px solid rgba(112, 93, 71, 0.15);
+    margin-top: 40px;
+  }
+
+  .footer-text {
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  /* ---- ANIMATIONS ---- */
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  @keyframes dotBounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ---- MOBILE ---- */
+  @media (max-width: 480px) {
+    .script-card {
+      padding: 28px 20px;
+    }
+    .header {
+      padding: 40px 0 28px;
+    }
+    .btn-begin {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER (always visible) -->
+<div class="header">
+  <div class="header-rule"></div>
+  <p class="header-eyebrow">Sloan Briar</p>
+  <h1 class="header-title">The Richual</h1>
+  <p class="header-subtitle">Write Your Life</p>
+  <div class="header-rule-bottom" style="opacity:0;animation:fadeUp 0.9s ease forwards 0.7s"></div>
+  <p class="header-intro">Your desires are sacred instructions. Let's put them into words.</p>
+</div>
+
+<div class="container">
+
+  <!-- WELCOME SCREEN -->
+  <div id="screen-welcome" class="screen active welcome-screen">
+    <p class="welcome-body">
+      In five minutes, you will have a personalized script written in your voice, for your life. Read it every morning. Read it every night. Watch what shifts.
+    </p>
+    <ul class="welcome-list">
+      <li>Answer seven simple questions about the life you are building</li>
+      <li>Your answers become a present-tense script tailored to you</li>
+      <li>Save it. Read it daily. This is your Richual.</li>
+      <li>No wrong answers. No perfect answers. Just yours.</li>
+    </ul>
+    <button class="btn-begin" onclick="startQuestions()">Begin My Richual</button>
+    <p class="welcome-note">Takes about 5 minutes ✦ Free to use</p>
+    <p style="font-size:13px;color:var(--gold);font-style:italic;margin-top:16px;line-height:1.7;max-width:400px;margin-left:auto;margin-right:auto;">Your answers are completely private. Nothing is stored, saved, or collected. Your words exist only to generate your script and then disappear. This is yours alone. ✦</p>
+  </div>
+
+  <!-- QUESTIONS SCREEN -->
+  <div id="screen-questions" class="screen questions-container">
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="question-block active" id="q1">
+      <p class="question-number">Question 1 of 7</p>
+      <h2 class="question-text">What does your ideal morning feel like?</h2>
+      <p class="question-hint">Where are you? What do you see, smell, feel? How does your body feel when you wake up?</p>
+      <textarea class="answer-field" id="a1" placeholder="I wake up feeling rested and at peace. My home feels calm and beautiful. I have all the time I need..." rows="5"></textarea>
+      <div class="question-nav">
+        <button class="btn-back hidden">Back</button>
+        <button class="btn-next" onclick="nextQuestion(1)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-block" id="q2">
+      <p class="question-number">Question 2 of 7</p>
+      <h2 class="question-text">What does your financial life look like?</h2>
+      <p class="question-hint">Be specific. What is in your bank account? How does money flow to you? How does it feel to pay your bills?</p>
+      <textarea class="answer-field" id="a2" placeholder="I have $10,000 saved and growing. Money comes to me through multiple streams. I pay every bill with ease..." rows="5"></textarea>
+      <div class="question-nav">
+        <button class="btn-back" onclick="prevQuestion(2)">← Back</button>
+        <button class="btn-next" onclick="nextQuestion(2)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-block" id="q3">
+      <p class="question-number">Question 3 of 7</p>
+      <h2 class="question-text">What does your work or purpose feel like?</h2>
+      <p class="question-hint">What are you creating? How does your work flow? How does it feel to do what you do every day?</p>
+      <textarea class="answer-field" id="a3" placeholder="My work feels aligned and effortless. I create things that help people and income comes in while I sleep..." rows="5"></textarea>
+      <div class="question-nav">
+        <button class="btn-back" onclick="prevQuestion(3)">← Back</button>
+        <button class="btn-next" onclick="nextQuestion(3)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-block" id="q4">
+      <p class="question-number">Question 4 of 7</p>
+      <h2 class="question-text">How does your body feel in this life?</h2>
+      <p class="question-hint">Your health, your energy, your beauty, how you carry yourself. What does it feel like to be in your body?</p>
+      <textarea class="answer-field" id="a4" placeholder="My body is strong and healthy. I wake up with energy. My skin glows. I move with confidence and ease..." rows="5"></textarea>
+      <div class="question-nav">
+        <button class="btn-back" onclick="prevQuestion(4)">← Back</button>
+        <button class="btn-next" onclick="nextQuestion(4)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-block" id="q5">
+      <p class="question-number">Question 5 of 7</p>
+      <h2 class="question-text">What do your relationships feel like?</h2>
+      <p class="question-hint">Your people. Your love. Your friendships. How does it feel to be surrounded by the right ones?</p>
+      <textarea class="answer-field" id="a5" placeholder="I am surrounded by people who celebrate me. My relationships are warm, loyal, and easy. Love comes to me naturally..." rows="5"></textarea>
+      <div class="question-nav">
+        <button class="btn-back" onclick="prevQuestion(5)">← Back</button>
+        <button class="btn-next" onclick="nextQuestion(5)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="question-block" id="q6">
+      <p class="question-number">Question 6 of 7</p>
+      <h2 class="question-text">What does your home and environment feel like?</h2>
+      <p class="question-hint">Where do you live? What does your space feel like? What do you see when you look around?</p>
+      <textarea class="answer-field" id="a6" placeholder="My home is beautiful and peaceful. Everything in it is intentional. I feel like myself here. It feels like luxury..." rows="5"></textarea>
+      <div class="question-nav">
+        <button class="btn-back" onclick="prevQuestion(6)">← Back</button>
+        <button class="btn-next" onclick="nextQuestion(6)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="question-block" id="q7">
+      <p class="question-number">Question 7 of 7</p>
+      <h2 class="question-text">What is one thing you are most grateful for in this life?</h2>
+      <p class="question-hint">You are already living this life in your script. What fills your heart the most?</p>
+      <textarea class="answer-field" id="a7" placeholder="I am most grateful for the peace I feel every single day. For the abundance that came. For becoming her..." rows="5"></textarea>
+      <div class="question-nav">
+        <button class="btn-back" onclick="prevQuestion(7)">← Back</button>
+        <button class="btn-next" onclick="generateScript()">Write My Script ✦</button>
+      </div>
+    </div>
+
+    <div class="error-box" id="error-box">
+      Something went quiet. Take a breath and try again. ✦
+    </div>
+  </div>
+
+  <!-- LOADING SCREEN -->
+  <div id="screen-loading" class="screen loading-screen">
+    <div class="loading-ornament">✦</div>
+    <h2 class="loading-title">Writing your life...</h2>
+    <p class="loading-text">Your answers are becoming the blueprint. Your brain is receiving its new instructions. This is the Richual beginning.</p>
+    <div class="loading-dots">
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+    </div>
+  </div>
+
+  <!-- SCRIPT SCREEN -->
+  <div id="screen-script" class="screen script-screen">
+    <div class="script-header">
+      <p class="script-eyebrow">Your Personal Script</p>
+      <h2 class="script-title">This is your life.</h2>
+      <p class="script-subtitle">Read it like you mean it.</p>
+      <div class="script-divider"></div>
+    </div>
+
+    <div class="script-card">
+      <div class="script-content" id="script-output"></div>
+    </div>
+
+    <div class="script-instructions">
+      <p class="script-instructions-title">Your daily practice</p>
+      <p class="script-instructions-text">Read this every morning before you touch your phone. Read it again at night before you sleep. Read it slowly. Out loud if you can. Feel every line. This is your Richual.</p>
+    </div>
+
+    <div class="script-actions">
+      <button class="btn-copy" onclick="copyScript()">Copy My Script</button>
+      <button class="btn-restart" onclick="restartApp()">Write a New Script</button>
+    </div>
+
+    <div class="upsell-card">
+      <div class="upsell-ornament">✦</div>
+      <h3 class="upsell-title">Go Deeper</h3>
+      <p class="upsell-text">Your script is the beginning. The Richual is the complete system — the neuroscience, the daily practice, the money mindset, and everything that makes this work on a level deeper than a script alone.</p>
+      <a href="#" class="btn-upsell" id="book-link" target="_blank">Get The Richual →</a>
+      <br><br>
+      <a href="#" style="font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:0.15em;text-transform:uppercase;color:var(--brown);text-decoration:none;border-bottom:1px solid rgba(112,93,71,0.4);padding-bottom:2px;" id="guide-link" target="_blank">How to use your script →</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p class="footer-text">Sloan Briar ✦ @sloan.briar ✦ The Richual</p>
+</div>
+
+<script>
+  let currentQuestion = 1;
+  const totalQuestions = 7;
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+    });
+    const target = document.getElementById('screen-' + id);
+    target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function startQuestions() {
+    currentQuestion = 1;
+    showScreen('questions');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const pct = ((currentQuestion - 1) / totalQuestions) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+
+  function nextQuestion(from) {
+    const answer = document.getElementById('a' + from).value.trim();
+    if (!answer) {
+      document.getElementById('a' + from).focus();
+      document.getElementById('a' + from).style.borderColor = 'rgba(112,93,71,0.7)';
+      return;
+    }
+
+    if (from < totalQuestions) {
+      document.getElementById('q' + from).classList.remove('active');
+      currentQuestion = from + 1;
+      document.getElementById('q' + currentQuestion).classList.add('active');
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function prevQuestion(from) {
+    document.getElementById('q' + from).classList.remove('active');
+    currentQuestion = from - 1;
+    document.getElementById('q' + currentQuestion).classList.add('active');
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function generateScript() {
+    const answer7 = document.getElementById('a7').value.trim();
+    if (!answer7) {
+      document.getElementById('a7').focus();
+      return;
+    }
+
+    const answers = {
+      morning: document.getElementById('a1').value,
+      finances: document.getElementById('a2').value,
+      work: document.getElementById('a3').value,
+      body: document.getElementById('a4').value,
+      relationships: document.getElementById('a5').value,
+      home: document.getElementById('a6').value,
+      gratitude: document.getElementById('a7').value,
+    };
+
+    showScreen('loading');
+    document.getElementById('error-box').style.display = 'none';
+
+    const prompt = `You are writing a personalized manifestation script for a woman based on her answers about her dream life. 
+
+Write a beautiful, flowing present-tense manifestation script that incorporates ALL of her answers. The script should:
+- Be written entirely in first person present tense ("I am", "I have", "I feel", "I wake up")
+- Feel warm, opulent, and deeply personal — like she is describing a life she is already living
+- Use elevated but accessible language — luxurious but not pretentious
+- Flow naturally like a piece of personal writing, not a list
+- Be 250-350 words long
+- Include a beautiful opening line and a powerful closing line
+- Use NO bullet points, NO headers, NO numbered lists — pure flowing prose paragraphs
+- NEVER use negative language (no "I don't", "I no longer", "I never") — only positive present-tense statements
+- Weave all seven areas of her life together seamlessly
+
+Her answers:
+Morning/environment: ${answers.morning}
+Financial life: ${answers.finances}
+Work/purpose: ${answers.work}
+Body/health: ${answers.body}
+Relationships: ${answers.relationships}
+Home/space: ${answers.home}
+Gratitude: ${answers.gratitude}
+
+Write ONLY the script itself. No introduction, no explanation, no title. Just the script starting immediately with the first line.`;
+
+    try {
+      const response = await fetch('/.netlify/functions/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+
+      if (!response.ok) throw new Error('API error');
+
+      const data = await response.json();
+      const scriptText = data.content
+        .filter(b => b.type === 'text')
+        .map(b => b.text)
+        .join('');
+
+      document.getElementById('script-output').textContent = scriptText;
+      showScreen('script');
+
+    } catch (err) {
+      showScreen('questions');
+      document.getElementById('q7').classList.add('active');
+      currentQuestion = 7;
+      updateProgress();
+      document.getElementById('error-box').style.display = 'block';
+      console.error(err);
+    }
+  }
+
+  function copyScript() {
+    const text = document.getElementById('script-output').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.btn-copy');
+      btn.textContent = 'Copied ✦';
+      setTimeout(() => { btn.textContent = 'Copy My Script'; }, 2500);
+    });
+  }
+
+  function restartApp() {
+    // Clear all answers
+    for (let i = 1; i <= 7; i++) {
+      document.getElementById('a' + i).value = '';
+      document.getElementById('q' + i).classList.remove('active');
+    }
+    document.getElementById('q1').classList.add('active');
+    currentQuestion = 1;
+    showScreen('welcome');
+  }
+
+  // Update book link — replace # with your actual Gumroad or KDP link
+  document.getElementById('book-link').href = 'https://www.amazon.com/dp/B0H3M4R8TJ';
+  document.getElementById('guide-link').href = 'https://honeygold.gumroad.com/l/vkqcl';
+</script>
+
+</body>
+</html>
